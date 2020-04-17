@@ -39,6 +39,9 @@ require 'Paddle'
 -- but which will mechanically function very differently
 require 'Ball'
 
+-- katz: Something to make winning more rewarding
+require 'Confetti'
+
 -- size of our actual window
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
@@ -49,6 +52,9 @@ VIRTUAL_HEIGHT = 243
 
 -- paddle movement speed
 PADDLE_SPEED = 200
+
+-- Limit score
+LIMIT_SCORE = 1
 
 --[[
     Called just once at the beginning of the game; used to set up
@@ -97,6 +103,9 @@ function love.load()
     -- place a ball in the middle of the screen
     ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 - 2, 4, 4)
 
+    -- confetti init
+    confetti = Confetti(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 1.35, 2, 300)
+
     -- initialize score variables
     player1Score = 0
     player2Score = 0
@@ -140,6 +149,9 @@ function love.update(dt)
         -- before switching to play, initialize ball's velocity based
         -- on player who last scored
         ball.dy = math.random(-50, 50)
+
+        -- reset confetti
+        confetti:reset()
         if servingPlayer == 1 then
             ball.dx = math.random(140, 200)
         else
@@ -200,7 +212,7 @@ function love.update(dt)
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player2Score == 10 then
+            if player2Score == LIMIT_SCORE then
                 winningPlayer = 2
                 gameState = 'done'
             else
@@ -215,7 +227,7 @@ function love.update(dt)
             player1Score = player1Score + 1
             sounds['score']:play()
 
-            if player1Score == 10 then
+            if player1Score == LIMIT_SCORE then
                 winningPlayer = 1
                 gameState = 'done'
             else
@@ -250,6 +262,11 @@ function love.update(dt)
     -- scale the velocity by dt so movement is framerate-independent
     if gameState == 'play' then
         ball:update(dt)
+    end
+
+    -- update the confetti position if the game is done
+    if gameState == 'done' then
+        confetti:update(dt)
     end
 
     player1:update(dt)
@@ -326,6 +343,12 @@ function love.draw()
             0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
         love.graphics.printf('Press Enter to restart!', 0, 30, VIRTUAL_WIDTH, 'center')
+
+        -- Celebration
+        -- love.graphics.setColor(0, 255, 0, 255)
+        confetti:render()
+        love.graphics.setColor(255, 255, 255, 255)
+
     end
 
     -- show the score before ball is rendered so it can move over the text
