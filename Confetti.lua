@@ -18,7 +18,7 @@ function Confetti:init(x, y, size, quantity)
     self.x = x
     self.y = y
     -- Gravity var
-    self.gravity = 0.98 -- Second day using Lua, should constant variables be here?
+    self.gravity = 98 -- Second day using Lua, should constant variables be here?
     -- Size of each pellet (?)
     self.size = size
     -- How many pellet(s)
@@ -52,7 +52,7 @@ function Confetti:update(dt)
     for i = 1, self.quantity do
         self.confetti_table[i].x = self.confetti_table[i].x + self.confetti_table[i].dx * dt
         self.confetti_table[i].y = self.confetti_table[i].y + self.confetti_table[i].dy * dt
-        self.confetti_table[i].dy = self.confetti_table[i].dy + self.gravity
+        self.confetti_table[i].dy = self.confetti_table[i].dy + self.gravity * dt
     end
 end
 
